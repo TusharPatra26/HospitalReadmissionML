@@ -122,6 +122,10 @@ python evaluate.py
 
 The prediction app and prediction tests require generated model files in `artifacts/models/`. If they are not present in your checkout, run `python train.py` first. The training workflow requires the raw CSV files in `data/raw/`.
 
+### Deploying on Render
+
+The `.python-version` file pins Render to Python 3.12, which is within the versions supported by the dependency constraints in `requirements.txt`. If your Render service has a `PYTHON_VERSION` environment variable set, remove it or set it to a Python 3.12 patch release; that setting takes precedence over `.python-version`. After pushing changes, trigger a new deploy.
+
 ---
 
 ## 5. Exploratory Data Analysis (EDA) Highlights

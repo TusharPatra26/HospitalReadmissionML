@@ -62,6 +62,3 @@ artifacts/explainability/*.joblib
 logs/
 *.log
 
-# Streamlit
-.streamlit/
-

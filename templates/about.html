@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}About & Limitations — Hospital Readmission Risk Predictor{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold text-dark mb-1">About the Hospital Readmission Risk Predictor</h2>
+    <p class="text-muted mb-0">Academic machine learning research prototype for explainable clinical risk estimation.</p>
+  </div>
+</div>
+
+<!-- Primary Disclaimer Banner -->
+<div class="card border-warning bg-light-warning mb-4 shadow-sm" style="background-color: #FFFBEB; border-left: 5px solid #F59E0B;">
+  <div class="card-body p-4">
+    <h5 class="fw-bold text-warning-emphasis mb-2"><i class="fa-solid fa-triangle-exclamation me-2"></i>Non-Clinical Research Disclaimer</h5>
+    <p class="text-secondary mb-0">
+      This application is an academic and research demonstration built using historical, de-identified electronic health records (EHR) collected between 1999 and 2008. 
+      The predictive models and SHAP explanations are <strong>not clinically validated medical devices</strong>. They must not be used for diagnosis, clinical decision-making, treatment prioritization, discharge timing, or real-time patient triage.
+    </p>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-database me-2"></i>Dataset Lineage & Target Definition
+      </div>
+      <div class="clinical-card-body">
+        <ul class="list-unstyled text-secondary small mb-3">
+          <li class="mb-2"><strong>Source:</strong> UCI Machine Learning Repository — Diabetes 130-US Hospitals (1999–2008).</li>
+          <li class="mb-2"><strong>Cohort Volume:</strong> 101,766 inpatient encounters across 130 clinical facilities.</li>
+          <li class="mb-2"><strong>Patient Cardinality:</strong> 71,518 unique patients (mean 1.42 encounters/patient; up to 40 repeat visits).</li>
+          <li class="mb-2"><strong>Target Definition:</strong> Binary 30-day readmission indicator (`readmitted == '<30'`). Readmissions after 30 days (`>30`) and non-readmissions (`NO`) are designated as negative.</li>
+          <li><strong>Prediction Point:</strong> Formulated strictly at the time of hospital discharge.</li>
+        </ul>
+        <div class="alert alert-light border small mb-0">
+          <i class="fa-solid fa-check text-success me-1"></i>
+          <strong>Patient-Aware Splitting Safeguard:</strong> Models were evaluated with strict group splitting on `patient_nbr` (70% train / 15% val / 15% test) to prevent cross-partition leakage of patient histories.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-layer-group me-2"></i>Technology Stack & System Architecture
+      </div>
+      <div class="clinical-card-body">
+        <div class="row g-3 text-secondary small">
+          <div class="col-6">
+            <h6 class="fw-bold text-dark mb-1">Modeling & Data Science</h6>
+            <ul class="list-unstyled mb-0">
+              <li>&bull; Python 3.12</li>
+              <li>&bull; Scikit-Learn 1.5</li>
+              <li>&bull; XGBoost 2.1</li>
+              <li>&bull; Imbalanced-Learn 0.14</li>
+              <li>&bull; SHAP 0.54</li>
+            </ul>
+          </div>
+          <div class="col-6">
+            <h6 class="fw-bold text-dark mb-1">Backend & Interface</h6>
+            <ul class="list-unstyled mb-0">
+              <li>&bull; Flask 3.1 & Jinja2</li>
+              <li>&bull; Bootstrap 5.3</li>
+              <li>&bull; Chart.js 4.4</li>
+              <li>&bull; Streamlit 1.66</li>
+              <li>&bull; Joblib 1.6</li>
+            </ul>
+          </div>
+        </div>
+        <hr class="my-3">
+        <p class="small text-muted mb-0">
+          <strong>Framework Independence:</strong> Flask and Streamlit share the identical prediction pipeline, input validation schemas, and SHAP explainers in `src/prediction/`. No ML inference logic is duplicated in web routes.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Ethical & Clinical Limitations -->
+<div class="row">
+  <div class="col-12">
+    <div class="clinical-card">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-shield-virus me-2"></i>Ethical Considerations & Clinical Limitations
+      </div>
+      <div class="clinical-card-body text-secondary small">
+        <div class="row g-4">
+          <div class="col-md-4">
+            <h6 class="fw-bold text-dark">1. Historical Temporal Mismatch</h6>
+            <p class="mb-0">
+              The dataset reflects clinical practices, diagnostic coding (ICD-9), and pharmacotherapy from 1999–2008. Contemporary diabetes medications (such as SGLT2 inhibitors and modern GLP-1 receptor agonists) are not represented.
+            </p>
+          </div>
+          <div class="col-md-4">
+            <h6 class="fw-bold text-dark">2. Social Determinants of Health (SDOH)</h6>
+            <p class="mb-0">
+              Key drivers of readmission—such as food insecurity, housing instability, transportation barriers, and health literacy—are absent from administrative inpatient billing claims, capping maximum achievable discrimination.
+            </p>
+          </div>
+          <div class="col-md-4">
+            <h6 class="fw-bold text-dark">3. Correlation vs. Causation</h6>
+            <p class="mb-0">
+              SHAP feature attributions reflect mathematical associations within the trained model, not biological mechanisms. Modifying a feature in real life does not guarantee an equivalent shift in readmission probability.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

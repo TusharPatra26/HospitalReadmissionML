@@ -1,0 +1,67 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python cache & build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# IDE & OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Machine Learning Artifacts & Data
+# Note: Raw data is preserved, interim/processed/large model dumps can be generated
+data/interim/*
+data/processed/*
+!data/raw/
+artifacts/models/*.pkl
+artifacts/models/*.joblib
+artifacts/explainability/*.pkl
+artifacts/explainability/*.joblib
+
+# Logs
+logs/
+*.log
+
+# Streamlit
+.streamlit/
+

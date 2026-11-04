@@ -1,0 +1,105 @@
+{
+    "mann_whitney": {
+        "time_in_hospital": {
+            "u_statistic": 465881132.0,
+            "p_value": 2.689648414149974e-59,
+            "median_no_readmit": 4.0,
+            "median_readmit": 4.0,
+            "mean_no_readmit": 4.349224081673285,
+            "mean_readmit": 4.768248657215814
+        },
+        "num_lab_procedures": {
+            "u_statistic": 494032308.0,
+            "p_value": 5.376925280923324e-11,
+            "median_no_readmit": 44.0,
+            "median_readmit": 45.0,
+            "mean_no_readmit": 42.953643995619906,
+            "mean_readmit": 44.22602800035221
+        },
+        "num_medications": {
+            "u_statistic": 470669577.5,
+            "p_value": 1.394204630726614e-47,
+            "median_no_readmit": 15.0,
+            "median_readmit": 16.0,
+            "mean_no_readmit": 15.911137165547677,
+            "mean_readmit": 16.903143435766488
+        },
+        "number_inpatient": {
+            "u_statistic": 404478396.0,
+            "p_value": 0.0,
+            "median_no_readmit": 0.0,
+            "median_readmit": 0.0,
+            "mean_no_readmit": 0.5616476235772987,
+            "mean_readmit": 1.224002817645505
+        },
+        "number_emergency": {
+            "u_statistic": 480734096.5,
+            "p_value": 4.613076191279194e-91,
+            "median_no_readmit": 0.0,
+            "median_readmit": 0.0,
+            "mean_no_readmit": 0.1778030948246303,
+            "mean_readmit": 0.3573126705996302
+        },
+        "number_diagnoses": {
+            "u_statistic": 471672632.0,
+            "p_value": 2.6777717689371373e-51,
+            "median_no_readmit": 8.0,
+            "median_readmit": 9.0,
+            "mean_no_readmit": 7.388667057483215,
+            "mean_readmit": 7.692788588535705
+        }
+    },
+    "chi2": {
+        "age": {
+            "chi2": 116.60891071617705,
+            "p_value": 6.5979228098776415e-21,
+            "dof": 9,
+            "cramers_v": 0.03385045549510897
+        },
+        "gender": {
+            "chi2": 1.2372549359096927,
+            "p_value": 0.5386832905074449,
+            "dof": 2,
+            "cramers_v": 0.0034868096982261162
+        },
+        "race": {
+            "chi2": 25.90848782434602,
+            "p_value": 9.295747546026607e-05,
+            "dof": 5,
+            "cramers_v": 0.01595584028939571
+        },
+        "insulin": {
+            "chi2": 190.8588139978854,
+            "p_value": 3.981889070324298e-41,
+            "dof": 3,
+            "cramers_v": 0.04330666676093992
+        },
+        "change": {
+            "chi2": 38.596054952359694,
+            "p_value": 5.212417406066974e-10,
+            "dof": 1,
+            "cramers_v": 0.01947466993359982
+        },
+        "A1Cresult": {
+            "chi2": 0.37537538880717924,
+            "p_value": 0.8288735286566032,
+            "dof": 2,
+            "cramers_v": 0.00469654662180944
+        },
+        "max_glu_serum": {
+            "chi2": 6.892902081752553,
+            "p_value": 0.031858500500547594,
+            "dof": 2,
+            "cramers_v": 0.035907616429515156
+        },
+        "admission_type_id": {
+            "chi2": 26.65706441586184,
+            "p_value": 0.0003841107670750078,
+            "dof": 7,
+            "cramers_v": 0.016184705766355112
+        }
+    },
+    "total_encounters": 101766,
+    "unique_patients": 71518,
+    "positive_rate": 0.11159915885462728
+}

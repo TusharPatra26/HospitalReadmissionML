@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Population Analytics — Hospital Readmission Risk Predictor{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold text-dark mb-1">Population Analytics & Demographic Exploration</h2>
+    <p class="text-muted mb-0">Cohort-level distributions, statistical disparities, and readmission incidence across the 101,766 encounters.</p>
+  </div>
+</div>
+
+<!-- Section 1: Demographics & Target -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-chart-pie me-2"></i>3-Class & Binary Target Distribution
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/eda/01_target_distribution.png') }}" class="img-fluid rounded border" alt="Target Distribution">
+        <div class="text-start small text-muted mt-3">
+          <strong>Key Insight:</strong> 30-day readmissions account for 11.16% (11,357 encounters), while 88.84% are non-readmissions or readmissions after 30 days. Baseline majority-class accuracy is 88.84%.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-users me-2"></i>Demographic Stratification (Age, Gender, Race)
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/eda/02_demographics_readmission.png') }}" class="img-fluid rounded border" alt="Demographics vs Readmission">
+        <div class="text-start small text-muted mt-3">
+          <strong>Key Insight:</strong> Readmission rates increase with age (from 4.0% in pediatric cases to 12.4% in 70-80 age bracket). Gender shows no statistically significant association (&chi;<sup>2</sup> = 1.24, p = 0.539).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 2: Clinical Factors & Prior Utilization -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-hospital-user me-2"></i>Prior Healthcare Utilization (Inpatient, Emergency, Outpatient)
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/eda/04_prior_utilization.png') }}" class="img-fluid rounded border" alt="Prior Utilization">
+        <div class="text-start small text-muted mt-3">
+          <strong>Dominant Predictive Signal:</strong> Mean prior inpatient admissions for readmitted patients (1.22 visits) is more than double non-readmitted patients (0.56 visits, p < 10<sup>-300</sup>). Patients with &ge;3 prior admissions face >27% readmission risk.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-notes-medical me-2"></i>Clinical Encounter Predictors
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/eda/03_clinical_factors.png') }}" class="img-fluid rounded border" alt="Clinical Factors">
+        <div class="text-start small text-muted mt-3">
+          <strong>Clinical Metrics:</strong> Longer hospital stays (mean 4.77 vs 4.35 days), polypharmacy (mean 16.9 vs 15.9 medications), and higher comorbidity count (mean 7.69 vs 7.39 diagnoses) are all statistically significantly associated with 30-day readmissions.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: Diabetes Meds & Missingness -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-vial me-2"></i>Glycemic Testing & Medication Titration
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/eda/05_diabetes_meds_and_hba1c.png') }}" class="img-fluid rounded border" alt="Diabetes Meds and HbA1c">
+        <div class="text-start small text-muted mt-3">
+          <strong>Testing & Titration:</strong> Active insulin dosage adjustments (Up/Down) correlate with higher readmission rates (12.5% vs 10.1% without insulin). HbA1c testing is strongly informative of physician order intent.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-magnifying-glass-chart me-2"></i>Missingness & Data Integrity Audit
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/eda/06_missingness_audit.png') }}" class="img-fluid rounded border" alt="Missingness Audit">
+        <div class="text-start small text-muted mt-3">
+          <strong>Missingness Strategy:</strong> `weight` was excluded (>96.8% missing). Medical specialty (49.1%) and payer code (39.6%) are preserved as informative 'Missing/Unknown' categories.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

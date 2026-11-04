@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Explainable AI & SHAP — Hospital Readmission Risk Predictor{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold text-dark mb-1">Explainable AI & SHAP Attribution Framework</h2>
+    <p class="text-muted mb-0">Demystifying gradient boosting predictions through game-theoretic Shapley additive explanations.</p>
+  </div>
+</div>
+
+<!-- Methodology Card -->
+<div class="clinical-card mb-4">
+  <div class="clinical-card-header">
+    <i class="fa-solid fa-brain me-2"></i>Why Explainability is Essential in Healthcare Machine Learning
+  </div>
+  <div class="clinical-card-body">
+    <div class="row g-4 align-items-center">
+      <div class="col-lg-8">
+        <p class="text-secondary mb-2">
+          Black-box machine learning models pose severe risks in clinical settings. Physicians, discharge planners, and quality officers cannot trust an uninterpretable probability score.
+        </p>
+        <p class="text-secondary mb-2">
+          In this project, we employ <strong>TreeSHAP</strong> (Lundberg et al., 2020), which computes exact Shapley values derived from cooperative game theory. Every feature's contribution $\phi_i$ satisfies <strong>local accuracy (additivity)</strong>:
+        </p>
+        <div class="p-3 bg-light rounded-3 font-monospace small mb-2 border text-center">
+          Model Output (Log-Odds Margin) = Base Value (&phi;<sub>0</sub> = -2.057) + &sum; &phi;<sub>i</sub>(Feature<sub>i</sub>)
+        </div>
+        <p class="text-secondary small mb-0">
+          This guarantees mathematical consistency: the sum of feature attributions plus the baseline cohort rate exactly reconstructs the model prediction without heuristic approximations.
+        </p>
+      </div>
+      <div class="col-lg-4">
+        <div class="p-3 bg-light rounded-3 border">
+          <h6 class="fw-bold text-dark mb-2"><i class="fa-solid fa-list-check text-primary me-2"></i>Core SHAP Properties</h6>
+          <ul class="list-unstyled small text-secondary mb-0">
+            <li class="mb-2"><i class="fa-solid fa-check text-teal me-2"></i><strong>Additive Efficiency:</strong> Sum of attributions equals model margin.</li>
+            <li class="mb-2"><i class="fa-solid fa-check text-teal me-2"></i><strong>Symmetry:</strong> Equal contributors receive equal importance.</li>
+            <li class="mb-2"><i class="fa-solid fa-check text-teal me-2"></i><strong>Null Player:</strong> Unused features receive zero SHAP value.</li>
+            <li><i class="fa-solid fa-check text-teal me-2"></i><strong>Directionality:</strong> Clear distinction between risk factors and protective factors.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Feature Importance & Summary -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-chart-column me-2"></i>Global Feature Importance (Mean Absolute SHAP)
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/shap/shap_importance_bar.png') }}" class="img-fluid rounded border shadow-sm" alt="SHAP Feature Importance Bar">
+        <div class="text-start small text-muted mt-3">
+          <strong>Interpretation:</strong> Ranked by mean absolute contribution across the cohort. Prior inpatient hospitalizations (`number_inpatient`) is the dominant factor, followed by discharge disposition, length of stay, and total medications.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-chart-line me-2"></i>SHAP Beeswarm Summary Plot (Impact & Direction)
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/shap/shap_summary_beeswarm.png') }}" class="img-fluid rounded border shadow-sm" alt="SHAP Beeswarm Summary Plot">
+        <div class="text-start small text-muted mt-3">
+          <strong>Interpretation:</strong> Each dot represents an encounter. Red indicates high feature values; blue indicates low feature values. High prior inpatient visits (red) shift SHAP values strongly to the right (higher readmission risk).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dependence Plots -->
+<div class="row mb-4">
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-network-wired me-2"></i>Dependence: Prior Inpatient Stays vs Risk
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/shap/shap_dependence_inpatient.png') }}" class="img-fluid rounded border shadow-sm" alt="SHAP Dependence Inpatient">
+        <div class="text-start small text-muted mt-3">
+          Shows the non-linear relationship between prior hospital admissions and model log-odds. Even 1 prior inpatient admission sharply increases readmission probability.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-network-wired me-2"></i>Dependence: Length of Stay vs Risk
+      </div>
+      <div class="clinical-card-body text-center">
+        <img src="{{ url_for('static', filename='../artifacts/plots/shap/shap_dependence_hospital_time.png') }}" class="img-fluid rounded border shadow-sm" alt="SHAP Dependence Length of Stay">
+        <div class="text-start small text-muted mt-3">
+          Illustrates that prolonged initial hospitalization (e.g. >7 days) acts as a surrogate marker for acute illness severity and medical complications, elevating readmission risk.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

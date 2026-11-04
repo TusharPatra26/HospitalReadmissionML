@@ -1,0 +1,17 @@
+{
+    "accuracy": 0.7146,
+    "precision": 0.2,
+    "recall": 0.5237,
+    "sensitivity": 0.5237,
+    "specificity": 0.7384,
+    "f1": 0.2894,
+    "roc_auc": 0.6859,
+    "pr_auc": 0.2463,
+    "brier_score": 0.0929,
+    "true_negatives": 9726,
+    "false_positives": 3445,
+    "false_negatives": 783,
+    "true_positives": 861,
+    "threshold": 0.13,
+    "inference_time_ms": 0.0023
+}

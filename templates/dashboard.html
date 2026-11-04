@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Overview Dashboard — Hospital Readmission Risk Predictor{% endblock %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+  <div class="col-md-8">
+    <h2 class="fw-bold text-dark mb-1">Clinical Overview & Performance Dashboard</h2>
+    <p class="text-muted mb-0">Retrospective risk estimation for 30-day unplanned hospital readmission in diabetic inpatients.</p>
+  </div>
+  <div class="col-md-4 text-md-end mt-3 mt-md-0">
+    <a href="{{ url_for('predict_page') }}" class="btn btn-clinical me-2">
+      <i class="fa-solid fa-calculator me-1"></i> Patient Prediction
+    </a>
+    <a href="{{ url_for('analytics_page') }}" class="btn btn-outline-secondary">
+      <i class="fa-solid fa-chart-pie me-1"></i> Population Data
+    </a>
+  </div>
+</div>
+
+<!-- Key Cohort Metrics -->
+<div class="row mb-4">
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card kpi-teal">
+      <div class="kpi-title">Total Cohort Encounters</div>
+      <div class="kpi-value">101,766</div>
+      <div class="kpi-subtext">Across 130 US hospitals (1999–2008)</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card kpi-cyan">
+      <div class="kpi-title">Unique Patients</div>
+      <div class="kpi-value">71,518</div>
+      <div class="kpi-subtext">Group-aware split applied strictly</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-title">30-Day Readmissions</div>
+      <div class="kpi-value">11,357</div>
+      <div class="kpi-subtext">11.16% positive prevalence (imbalanced)</div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-xl-3">
+    <div class="kpi-card kpi-coral">
+      <div class="kpi-title">Selected Model ROC-AUC</div>
+      <div class="kpi-value">{{ "%.3f"|format(metrics.get('roc_auc', 0.686)) }}</div>
+      <div class="kpi-subtext">PR-AUC: {{ "%.3f"|format(metrics.get('pr_auc', 0.246)) }} &bull; Test Set</div>
+    </div>
+  </div>
+</div>
+
+<!-- Performance KPIs of Selected Model -->
+<div class="row mb-4">
+  <div class="col-lg-8">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header d-flex justify-content-between align-items-center">
+        <span><i class="fa-solid fa-microchip me-2"></i>Active Model Performance & Calibration (Test Partition)</span>
+        <span class="badge bg-primary">{{ metadata.get('model_name', 'XGBoost (Unweighted)') }}</span>
+      </div>
+      <div class="clinical-card-body">
+        <div class="row g-3 text-center mb-4">
+          <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3 border">
+              <div class="text-muted small fw-bold">SENSITIVITY (RECALL)</div>
+              <div class="fs-4 fw-bold text-danger">{{ "%.1f"|format(metrics.get('recall', 0.524) * 100) }}%</div>
+              <div class="small text-muted">Detects readmissions</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3 border">
+              <div class="text-muted small fw-bold">SPECIFICITY</div>
+              <div class="fs-4 fw-bold text-success">{{ "%.1f"|format(metrics.get('specificity', 0.738) * 100) }}%</div>
+              <div class="small text-muted">Clears non-readmissions</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3 border">
+              <div class="text-muted small fw-bold">PR-AUC (AVG PREC.)</div>
+              <div class="fs-4 fw-bold text-primary">{{ "%.3f"|format(metrics.get('pr_auc', 0.246)) }}</div>
+              <div class="small text-muted">>2.2x over baseline</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="p-3 bg-light rounded-3 border">
+              <div class="text-muted small fw-bold">DECISION THRESHOLD</div>
+              <div class="fs-4 fw-bold text-dark">{{ "%.3f"|format(metadata.get('best_threshold', 0.130)) }}</div>
+              <div class="small text-muted">Validation-optimized</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info d-flex align-items-center mb-0" role="alert">
+          <i class="fa-solid fa-circle-info fs-4 me-3"></i>
+          <div>
+            <strong>Validation-Guided Threshold Optimization:</strong> Because positive readmission prevalence is 11.2%, 
+            using the standard 0.5 threshold yields near-zero recall. Our pipeline optimized the threshold to 
+            <strong>{{ "%.3f"|format(metadata.get('best_threshold', 0.130)) }}</strong> on validation data, achieving 
+            <strong>{{ "%.1f"|format(metrics.get('recall', 0.524) * 100) }}% recall</strong> and 
+            <strong>{{ "%.1f"|format(metrics.get('specificity', 0.738) * 100) }}% specificity</strong> on untouched test data.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="clinical-card h-100">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-bullseye me-2"></i>Class Imbalance Target
+      </div>
+      <div class="clinical-card-body d-flex flex-column justify-content-center">
+        <div style="height: 220px; position: relative;">
+          <canvas id="targetDonutChart"></canvas>
+        </div>
+        <div class="text-center mt-3 text-muted small">
+          Derived binary target: <strong>11,357</strong> Positive (<30d) vs <strong>90,409</strong> Negative (NO / >30d).
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Healthcare Context -->
+<div class="row">
+  <div class="col-12">
+    <div class="clinical-card">
+      <div class="clinical-card-header">
+        <i class="fa-solid fa-book-medical me-2"></i>Why 30-Day Hospital Readmission Prediction Matters in Diabetes Care
+      </div>
+      <div class="clinical-card-body">
+        <div class="row g-4">
+          <div class="col-md-4">
+            <h6 class="fw-bold text-primary"><i class="fa-solid fa-hand-holding-dollar me-2"></i>Health Policy & HRRP Benchmarks</h6>
+            <p class="text-secondary small mb-0">
+              Under the Hospital Readmissions Reduction Program (HRRP), hospitals face financial reimbursement penalties for excessive 30-day readmissions. Identifying high-risk patients at discharge empowers health systems to allocate post-discharge care management effectively.
+            </p>
+          </div>
+          <div class="col-md-4">
+            <h6 class="fw-bold text-teal"><i class="fa-solid fa-syringe me-2"></i>Complex Glycemic & Medication Titration</h6>
+            <p class="text-secondary small mb-0">
+              Diabetic inpatients frequently experience medication changes, insulin initiation, and fluctuating glycemic control. Inadequate discharge counseling, polypharmacy confusion, or delayed follow-up significantly heighten readmission vulnerability.
+            </p>
+          </div>
+          <div class="col-md-4">
+            <h6 class="fw-bold text-coral"><i class="fa-solid fa-shield-halved me-2"></i>Ethical Machine Learning Principles</h6>
+            <p class="text-secondary small mb-0">
+              Algorithmic risk predictions must never withhold or delay necessary medical care. They serve purely as an operational early-warning screen to trigger supportive post-discharge transitional services (e.g. nurse calls, timely PCP follow-up).
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const ctx = document.getElementById("targetDonutChart").getContext("2d");
+    new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Non-Readmitted / >30d (88.8%)", "30-Day Readmitted (11.2%)"],
+        datasets: [{
+          data: [90409, 11357],
+          backgroundColor: ["#1E3A8A", "#EF4444"],
+          borderWidth: 2,
+          borderColor: "#FFFFFF"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: "bottom", labels: { boxWidth: 12, font: { size: 11 } } }
+        },
+        cutout: "70%"
+      }
+    });
+  });
+</script>
+{% endblock %}
+

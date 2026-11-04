@@ -1,0 +1,135 @@
+# Hospital Readmission Risk Predictor Configuration
+
+project:
+  name: "Hospital Readmission Risk Predictor"
+  version: "1.0.0"
+  description: "Explainable ML system for estimating 30-day hospital readmission risk in diabetic patient encounters"
+  author: "Healthcare ML Engineering Team"
+  random_seed: 42
+
+paths:
+  raw_data_dir: "data/raw"
+  diabetic_data_path: "data/raw/diabetic_data.csv"
+  ids_mapping_path: "data/raw/IDS_mapping.csv"
+  interim_data_dir: "data/interim"
+  processed_data_dir: "data/processed"
+  
+  artifacts_dir: "artifacts"
+  models_dir: "artifacts/models"
+  explainability_dir: "artifacts/explainability"
+  evaluation_dir: "artifacts/evaluation"
+  plots_dir: "artifacts/plots"
+  eda_plots_dir: "artifacts/plots/eda"
+  training_plots_dir: "artifacts/plots/training"
+  shap_plots_dir: "artifacts/plots/shap"
+  
+  reports_dir: "reports"
+  logs_dir: "logs"
+
+dataset:
+  expected_rows: 101766
+  expected_cols: 50
+  raw_target_column: "readmitted"
+  binary_target_column: "readmitted_30_days"
+  positive_label: "<30"
+  negative_labels: [">30", "NO"]
+  id_columns: ["encounter_id", "patient_nbr"]
+  patient_id_column: "patient_nbr"
+  encounter_id_column: "encounter_id"
+
+data_cleansing:
+  missing_markers: ["?", "", "None", "Unknown/Invalid"]
+  high_missing_drop_threshold: 0.90 # weight is 96.86% missing
+  columns_to_drop_high_missing: ["weight"]
+  
+  # Temporal Leakage & Clinical Exclusion:
+  # Discharges indicating death or hospice cannot have legitimate 30-day readmissions.
+  # From IDS_mapping.csv:
+  # 11: Expired
+  # 13: Hospice / home
+  # 14: Hospice / medical facility
+  # 19: Expired at home. Medicaid only, hospice.
+  # 20: Expired in a medical facility. Medicaid only, hospice.
+  # 21: Expired, place unknown. Medicaid only, hospice.
+  dead_or_hospice_disposition_ids: [11, 13, 14, 19, 20, 21]
+
+splitting:
+  group_column: "patient_nbr"
+  test_size: 0.15
+  val_size: 0.15
+  random_state: 42
+
+features:
+  numerical_cols:
+    - "time_in_hospital"
+    - "num_lab_procedures"
+    - "num_procedures"
+    - "num_medications"
+    - "number_outpatient"
+    - "number_emergency"
+    - "number_inpatient"
+    - "number_diagnoses"
+    - "total_prior_visits"
+    - "num_med_changes"
+    - "num_diabetes_meds"
+  
+  categorical_cols:
+    - "race"
+    - "gender"
+    - "age_group"
+    - "admission_type"
+    - "discharge_disposition"
+    - "admission_source"
+    - "medical_specialty_binned"
+    - "diag_1_group"
+    - "diag_2_group"
+    - "diag_3_group"
+    - "max_glu_serum"
+    - "A1Cresult"
+    - "insulin"
+    - "change"
+    - "diabetesMed"
+
+models:
+  baseline_logistic:
+    penalty: "l2"
+    C: 1.0
+    solver: "lbfgs"
+    max_iter: 1000
+    random_state: 42
+  
+  random_forest:
+    n_estimators: 200
+    max_depth: 12
+    min_samples_split: 10
+    min_samples_leaf: 5
+    random_state: 42
+    n_jobs: -1
+  
+  xgboost:
+    n_estimators: 250
+    max_depth: 5
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    eval_metric: "logloss"
+    random_state: 42
+    n_jobs: -1
+
+evaluation:
+  default_threshold: 0.5
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1"
+    - "specificity"
+    - "roc_auc"
+    - "pr_auc"
+    - "brier_score"
+
+app:
+  host: "127.0.0.1"
+  port: 5000
+  debug: false
+

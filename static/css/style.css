@@ -1,0 +1,246 @@
+/* Hospital Readmission Risk Predictor — Modern Clinical Healthcare Theme */
+
+:root {
+  --primary-navy: #0F172A;
+  --secondary-navy: #1E3A8A;
+  --accent-teal: #0D9488;
+  --accent-cyan: #06B6D4;
+  --accent-amber: #F59E0B;
+  --accent-coral: #EF4444;
+  --accent-emerald: #10B981;
+  --bg-slate: #F8FAFC;
+  --card-bg: #FFFFFF;
+  --border-slate: #E2E8F0;
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-slate);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar-clinical {
+  background: linear-gradient(135deg, var(--primary-navy) 0%, var(--secondary-navy) 100%);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+  padding: 0.8rem 1.5rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+  color: #FFFFFF !important;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.navbar-brand i {
+  color: var(--accent-cyan);
+}
+
+.nav-link {
+  color: #CBD5E1 !important;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #FFFFFF !important;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Cards & Surfaces */
+.clinical-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-slate);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  margin-bottom: 1.5rem;
+}
+
+.clinical-card:hover {
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.clinical-card-header {
+  padding: 1rem 1.25rem;
+  background-color: #FFFFFF;
+  border-bottom: 1px solid var(--border-slate);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  font-weight: 600;
+  color: var(--secondary-navy);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clinical-card-body {
+  padding: 1.25rem;
+}
+
+/* Stat & KPI Cards */
+.kpi-card {
+  border-left: 4px solid var(--secondary-navy);
+  padding: 1.25rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  margin-bottom: 1rem;
+}
+
+.kpi-card.kpi-teal { border-left-color: var(--accent-teal); }
+.kpi-card.kpi-amber { border-left-color: var(--accent-amber); }
+.kpi-card.kpi-coral { border-left-color: var(--accent-coral); }
+.kpi-card.kpi-cyan { border-left-color: var(--accent-cyan); }
+
+.kpi-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.kpi-value {
+  font-size: 1.85rem;
+  font-weight: 700;
+  color: var(--primary-navy);
+  margin-bottom: 0.2rem;
+}
+
+.kpi-subtext {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Buttons */
+.btn-clinical {
+  background: linear-gradient(135deg, var(--secondary-navy) 0%, #2563EB 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+  transition: all 0.2s;
+}
+
+.btn-clinical:hover {
+  background: linear-gradient(135deg, #1E40AF 0%, #1D4ED8 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-clinical-teal {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, #0F766E 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 0.65rem 1.4rem;
+}
+
+.btn-clinical-teal:hover {
+  background: #0D9488;
+  color: white;
+}
+
+/* Persona Chips */
+.persona-chip {
+  cursor: pointer;
+  border: 1px solid var(--border-slate);
+  background: white;
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.2s;
+}
+
+.persona-chip:hover {
+  border-color: var(--secondary-navy);
+  background-color: #F1F5F9;
+}
+
+.persona-chip.active {
+  border-color: var(--secondary-navy);
+  background-color: #EFF6FF;
+}
+
+/* Disclaimer Banner */
+.disclaimer-banner {
+  background-color: #FEF3C7;
+  border-left: 4px solid var(--accent-amber);
+  color: #92400E;
+  padding: 0.85rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.88rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Footer */
+footer {
+  margin-top: auto;
+  background-color: var(--primary-navy);
+  color: #94A3B8;
+  padding: 1.5rem 0;
+  font-size: 0.85rem;
+}
+
+/* Form Styles */
+.form-label {
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #334155;
+  margin-bottom: 0.25rem;
+}
+
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid var(--border-slate);
+  font-size: 0.9rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--secondary-navy);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15);
+}
+
+/* Badges */
+.badge-low {
+  background-color: #DEF7EC;
+  color: #03543F;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+
+.badge-mod {
+  background-color: #FEF08A;
+  color: #854D0E;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+
+.badge-high {
+  background-color: #FDE8E8;
+  color: #9B1C1C;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+

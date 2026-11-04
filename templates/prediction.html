@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Risk Prediction — Hospital Readmission Risk Predictor{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col-12">
+    <h2 class="fw-bold text-dark mb-1">Patient 30-Day Readmission Risk Estimation</h2>
+    <p class="text-muted mb-0">Estimate the probability of acute hospital readmission at discharge and review personalized SHAP feature attributions.</p>
+  </div>
+</div>
+
+<!-- Persona Selection Bar -->
+<div class="clinical-card mb-4">
+  <div class="clinical-card-header bg-light">
+    <i class="fa-solid fa-users-viewfinder me-2"></i>Quick-Load Illustrative Clinical Personas (Academic Demo)
+  </div>
+  <div class="clinical-card-body py-3">
+    <div class="row g-2">
+      <div class="col-md-4">
+        <button type="button" class="btn btn-outline-success w-100 text-start persona-btn" id="btn-persona-low" onclick="loadPersona('low')">
+          <div class="fw-bold"><i class="fa-solid fa-circle-check me-2"></i>Persona A: Lower Risk Routine Patient</div>
+          <div class="small opacity-75">Elective, young adult, 0 prior admissions, no insulin</div>
+        </button>
+      </div>
+      <div class="col-md-4">
+        <button type="button" class="btn btn-outline-warning w-100 text-start persona-btn" id="btn-persona-moderate" onclick="loadPersona('moderate')">
+          <div class="fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Persona B: Moderate Risk Inpatient</div>
+          <div class="small opacity-75">Age 65, Emergency, 1 prior admission, stable insulin</div>
+        </button>
+      </div>
+      <div class="col-md-4">
+        <button type="button" class="btn btn-outline-danger w-100 text-start persona-btn" id="btn-persona-high" onclick="loadPersona('high')">
+          <div class="fw-bold"><i class="fa-solid fa-triangle-exclamation me-2"></i>Persona C: Complex High-Utilizer</div>
+          <div class="small opacity-75">Age 75, 3 prior admissions, insulin dose up, 9 diagnoses</div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<form id="patientPredictionForm">
+  <div class="row">
+    <!-- Card 1: Demographics -->
+    <div class="col-md-6 col-lg-4">
+      <div class="clinical-card h-100">
+        <div class="clinical-card-header">
+          <i class="fa-solid fa-user me-2"></i>1. Patient Demographics
+        </div>
+        <div class="clinical-card-body">
+          <div class="mb-3">
+            <label class="form-label" for="age">Age Category</label>
+            <select class="form-select" id="age" name="age" required>
+              <option value="[50-60)">[50-60) years</option>
+              <option value="[0-10)">[0-10) years</option>
+              <option value="[10-20)">[10-20) years</option>
+              <option value="[20-30)">[20-30) years</option>
+              <option value="[30-40)">[30-40) years</option>
+              <option value="[40-50)">[40-50) years</option>
+              <option value="[60-70)">[60-70) years</option>
+              <option value="[70-80)" selected>[70-80) years</option>
+              <option value="[80-90)">[80-90) years</option>
+              <option value="[90-100)">[90-100) years</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="gender">Gender</label>
+            <select class="form-select" id="gender" name="gender" required>
+              <option value="Female" selected>Female</option>
+              <option value="Male">Male</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="race">Race / Background</label>
+            <select class="form-select" id="race" name="race" required>
+              <option value="Caucasian" selected>Caucasian</option>
+              <option value="AfricanAmerican">African American</option>
+              <option value="Hispanic">Hispanic</option>
+              <option value="Asian">Asian</option>
+              <option value="Other">Other</option>
+              <option value="Missing/Unknown">Missing / Not Recorded</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Encounter / Hospitalization -->
+    <div class="col-md-6 col-lg-4">
+      <div class="clinical-card h-100">
+        <div class="clinical-card-header">
+          <i class="fa-solid fa-hospital me-2"></i>2. Hospitalization & Discharge
+        </div>
+        <div class="clinical-card-body">
+          <div class="mb-3">
+            <label class="form-label" for="admission_type">Admission Type</label>
+            <select class="form-select" id="admission_type" name="admission_type" required>
+              <option value="Emergency" selected>Emergency</option>
+              <option value="Urgent">Urgent</option>
+              <option value="Elective">Elective</option>
+              <option value="Trauma Center">Trauma Center</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="discharge_disposition">Discharge Disposition</label>
+            <select class="form-select" id="discharge_disposition" name="discharge_disposition" required>
+              <option value="Discharged to home" selected>Discharged to home</option>
+              <option value="Discharged/transferred to SNF">Discharged to SNF (Skilled Nursing)</option>
+              <option value="Discharged/transferred to home with home health service">Home with Home Health Service</option>
+              <option value="Discharged/transferred to another short term hospital">Short Term Hospital Transfer</option>
+              <option value="Left AMA">Left Against Medical Advice (AMA)</option>
+              <option value="Unknown">Other / Unknown</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="admission_source">Admission Source</label>
+            <select class="form-select" id="admission_source" name="admission_source" required>
+              <option value="Emergency Room" selected>Emergency Room</option>
+              <option value="Physician Referral">Physician Referral</option>
+              <option value="Clinic Referral">Clinic Referral</option>
+              <option value="Transfer from a hospital">Hospital Transfer</option>
+              <option value="Unknown">Other / Unknown</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="time_in_hospital">Length of Stay (Days: 1–14)</label>
+            <input type="number" class="form-control" id="time_in_hospital" name="time_in_hospital" min="1" max="14" value="4" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Clinical & Diagnostic Profile -->
+    <div class="col-md-6 col-lg-4">
+      <div class="clinical-card h-100">
+        <div class="clinical-card-header">
+          <i class="fa-solid fa-stethoscope me-2"></i>3. Diagnosis & Acuity
+        </div>
+        <div class="clinical-card-body">
+          <div class="mb-3">
+            <label class="form-label" for="diag_1_group">Primary Diagnosis Group</label>
+            <select class="form-select" id="diag_1_group" name="diag_1_group" required>
+              <option value="Circulatory" selected>Circulatory (Heart, Vascular)</option>
+              <option value="Diabetes">Diabetes Mellitus (250.xx)</option>
+              <option value="Respiratory">Respiratory (Pneumonia, COPD)</option>
+              <option value="Digestive">Digestive Disorders</option>
+              <option value="Genitourinary">Genitourinary / Renal</option>
+              <option value="Injury">Injury & Poisoning</option>
+              <option value="Musculoskeletal">Musculoskeletal</option>
+              <option value="Neoplasms">Neoplasms (Oncology)</option>
+              <option value="Other/Unknown">Other Conditions</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="diag_2_group">Secondary Diagnosis</label>
+            <select class="form-select" id="diag_2_group" name="diag_2_group">
+              <option value="Diabetes" selected>Diabetes Mellitus</option>
+              <option value="Circulatory">Circulatory</option>
+              <option value="Respiratory">Respiratory</option>
+              <option value="Genitourinary">Genitourinary</option>
+              <option value="Other/Unknown">Other/Unknown</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="diag_3_group">Tertiary Diagnosis</label>
+            <select class="form-select" id="diag_3_group" name="diag_3_group">
+              <option value="Respiratory" selected>Respiratory</option>
+              <option value="Circulatory">Circulatory</option>
+              <option value="Genitourinary">Genitourinary</option>
+              <option value="Diabetes">Diabetes</option>
+              <option value="Other/Unknown">Other/Unknown</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="number_diagnoses">Total Recorded Diagnoses (1–16)</label>
+            <input type="number" class="form-control" id="number_diagnoses" name="number_diagnoses" min="1" max="16" value="7" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Laboratory Results -->
+    <div class="col-md-6 col-lg-4">
+      <div class="clinical-card h-100">
+        <div class="clinical-card-header">
+          <i class="fa-solid fa-vial-virus me-2"></i>4. Lab Tests & Results
+        </div>
+        <div class="clinical-card-body">
+          <div class="mb-3">
+            <label class="form-label" for="A1Cresult">HbA1c Test Result</label>
+            <select class="form-select" id="A1Cresult" name="A1Cresult" required>
+              <option value="None" selected>None (Test was not ordered)</option>
+              <option value="Norm">Norm (Within normal limit)</option>
+              <option value=">7">>7 (Elevated, >7%)</option>
+              <option value=">8">>8 (Severely Elevated, >8%)</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="max_glu_serum">Glucose Serum Test</label>
+            <select class="form-select" id="max_glu_serum" name="max_glu_serum" required>
+              <option value="None" selected>None (Test not ordered)</option>
+              <option value="Norm">Norm (Normal)</option>
+              <option value=">200">>200 mg/dL</option>
+              <option value=">300">>300 mg/dL</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="num_lab_procedures">Lab Procedures Count (1–130)</label>
+            <input type="number" class="form-control" id="num_lab_procedures" name="num_lab_procedures" min="1" max="130" value="45" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="num_procedures">Non-Lab Procedures Count (0–6)</label>
+            <input type="number" class="form-control" id="num_procedures" name="num_procedures" min="0" max="6" value="1" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5: Medications & Diabetes Management -->
+    <div class="col-md-6 col-lg-4">
+      <div class="clinical-card h-100">
+        <div class="clinical-card-header">
+          <i class="fa-solid fa-pills me-2"></i>5. Medication Regimen
+        </div>
+        <div class="clinical-card-body">
+          <div class="mb-3">
+            <label class="form-label" for="insulin">Insulin Prescription & Titration</label>
+            <select class="form-select" id="insulin" name="insulin" required>
+              <option value="No">No (Not prescribed)</option>
+              <option value="Steady">Steady (Dosage maintained)</option>
+              <option value="Up" selected>Up (Dosage increased during stay)</option>
+              <option value="Down">Down (Dosage decreased during stay)</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="change">Diabetic Medication Dosage Changed?</label>
+            <select class="form-select" id="change" name="change" required>
+              <option value="Ch" selected>Ch (Yes, medication changed)</option>
+              <option value="No">No (No medication adjustment)</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="diabetesMed">Prescribed Any Diabetes Medication?</label>
+            <select class="form-select" id="diabetesMed" name="diabetesMed" required>
+              <option value="Yes" selected>Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="num_medications">Total Medications Count (1–50)</label>
+            <input type="number" class="form-control" id="num_medications" name="num_medications" min="1" max="50" value="16" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6: Prior Healthcare Utilization -->
+    <div class="col-md-6 col-lg-4">
+      <div class="clinical-card h-100">
+        <div class="clinical-card-header">
+          <i class="fa-solid fa-clock-rotate-left me-2"></i>6. Prior 12-Month Utilization
+        </div>
+        <div class="clinical-card-body">
+          <div class="mb-3">
+            <label class="form-label" for="number_inpatient">Prior Inpatient Admissions</label>
+            <input type="number" class="form-control" id="number_inpatient" name="number_inpatient" min="0" max="25" value="1" required>
+            <div class="form-text text-danger small"><i class="fa-solid fa-triangle-exclamation me-1"></i>Primary predictive signal in dataset.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="number_emergency">Prior Emergency Visits</label>
+            <input type="number" class="form-control" id="number_emergency" name="number_emergency" min="0" max="25" value="0" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="number_outpatient">Prior Outpatient Visits</label>
+            <input type="number" class="form-control" id="number_outpatient" name="number_outpatient" min="0" max="25" value="0" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="medical_specialty">Admitting Medical Specialty</label>
+            <select class="form-select" id="medical_specialty" name="medical_specialty">
+              <option value="InternalMedicine" selected>Internal Medicine</option>
+              <option value="Emergency/Trauma">Emergency / Trauma</option>
+              <option value="Cardiology">Cardiology</option>
+              <option value="Family/GeneralPractice">Family Practice</option>
+              <option value="Surgery">Surgery</option>
+              <option value="Missing/Unknown">Missing / Not Recorded</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <button type="reset" class="btn btn-outline-secondary px-4">
+      <i class="fa-solid fa-rotate-left me-2"></i>Reset Form
+    </button>
+    <button type="submit" class="btn btn-clinical btn-lg px-5 shadow" id="btnPredict">
+      <i class="fa-solid fa-calculator me-2"></i>Predict 30-Day Readmission Risk
+    </button>
+  </div>
+</form>
+
+<!-- Prediction & SHAP Results Card (Initially Hidden) -->
+<div class="clinical-card shadow-lg border-primary mb-5" id="predictionResultCard" style="display: none;">
+  <div class="clinical-card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
+    <div class="d-flex align-items-center gap-2">
+      <i class="fa-solid fa-chart-simple text-warning fs-5"></i>
+      <span class="fs-5 fw-bold">Individual Patient Risk Assessment & SHAP Attribution</span>
+    </div>
+    <span id="resRiskTierBadge" class="badge">Risk Tier</span>
+  </div>
+  <div class="clinical-card-body p-4">
+    <!-- Top KPI Grid -->
+    <div class="row align-items-center mb-4 pb-3 border-bottom">
+      <div class="col-md-4 text-center border-end">
+        <div class="text-muted small fw-bold text-uppercase">Estimated Readmission Probability</div>
+        <div class="display-4 fw-bold text-primary my-1" id="resProb">--%</div>
+        <div class="small text-muted" id="resThreshold">Optimized Threshold: 13.0%</div>
+      </div>
+      <div class="col-md-8 ps-md-4 mt-3 mt-md-0">
+        <h5 class="fw-bold text-dark mb-2">Model Rationale</h5>
+        <p class="text-secondary mb-2" id="resRationale">--</p>
+        <p class="small text-muted mb-0" id="resNarrative">--</p>
+      </div>
+    </div>
+
+    <!-- Recommendations & SHAP Plot -->
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6">
+        <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-clipboard-check text-teal me-2"></i>Suggested Transitional Care Actions</h6>
+        <ul class="list-unstyled ps-1" id="resRecommendations">
+          <!-- Populated dynamically -->
+        </ul>
+
+        <div class="p-3 bg-light rounded-3 mt-3 border">
+          <div class="small fw-bold text-muted mb-1"><i class="fa-solid fa-scale-balanced me-1"></i>Decision Rule Reference</div>
+          <p class="small text-secondary mb-0">
+            Encounters exceeding the <strong>13.0%</strong> decision threshold are flagged for supportive care coordination. 
+            This threshold was selected on validation data to achieve a <strong>52.4% sensitivity</strong> benchmark while preserving 
+            <strong>73.8% specificity</strong> across hospital encounters.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <h6 class="fw-bold text-dark mb-3"><i class="fa-solid fa-brain text-primary me-2"></i>Personalized SHAP Feature Contributions (Log-Odds)</h6>
+        <div style="height: 280px; position: relative;">
+          <canvas id="localShapCanvas"></canvas>
+        </div>
+        <div class="d-flex justify-content-between small text-muted mt-2">
+          <span><span class="badge bg-danger me-1">&nbsp;</span>Red = Elevates Readmission Risk</span>
+          <span><span class="badge bg-teal me-1">&nbsp;</span>Teal = Attenuates / Protective</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mandatory Clinical Disclaimer -->
+    <div class="alert alert-warning small mb-0 d-flex align-items-center">
+      <i class="fa-solid fa-circle-exclamation fs-4 me-3 text-warning"></i>
+      <div>
+        <strong>Non-Clinical Research Notice:</strong> Algorithmic estimates do not establish biological causation, 
+        medical diagnosis, or treatment recommendations. Predictions reflect historical correlational patterns from 1999–2008. 
+        Clinical decisions must always be made by licensed medical providers.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/prediction.js') }}"></script>
+{% endblock %}
+

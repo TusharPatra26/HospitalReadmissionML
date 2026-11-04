@@ -25,3 +25,4 @@ Werkzeug>=3.0.1
 
 # Testing & quality
 pytest>=8.0.0
+gunicorn

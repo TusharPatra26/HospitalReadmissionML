@@ -1,0 +1,51 @@
+{
+  "name": "ca-certificates",
+  "version": "2026.10.20",
+  "build": "h382c6e5_1",
+  "build_number": 1,
+  "channel": "https://repo.anaconda.com/pkgs/main/noarch",
+  "subdir": "noarch",
+  "fn": "ca-certificates-2026.10.20-h382c6e5_1.conda",
+  "md5": "76ad55df163147b070214576f7ff08f9",
+  "url": "https://repo.anaconda.com/pkgs/main/noarch/ca-certificates-2026.10.20-h382c6e5_1.conda",
+  "sha256": "433099596e8d47e78818b9334b229830cb6c2185ad390e5ec8f1f8b3e72492c3",
+  "depends": [
+    "__win"
+  ],
+  "constrains": [],
+  "noarch": "generic",
+  "license": "MPL-2.0",
+  "package_type": "noarch_generic",
+  "timestamp": 1793640191000,
+  "size": 115851,
+  "requested_spec": "None",
+  "package_tarball_full_path": "C:\\Users\\tushi\\anaconda3\\pkgs\\ca-certificates-2026.10.20-h382c6e5_1.conda",
+  "extracted_package_dir": "C:\\Users\\tushi\\anaconda3\\pkgs\\ca-certificates-2026.10.20-h382c6e5_1",
+  "files": [
+    "Library/ssl/cacert.pem",
+    "Library/ssl/cert.pem"
+  ],
+  "paths_data": {
+    "paths_version": 1,
+    "paths": [
+      {
+        "_path": "Library/ssl/cacert.pem",
+        "path_type": "hardlink",
+        "sha256": "796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe",
+        "size_in_bytes": 200116,
+        "sha256_in_prefix": "796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe"
+      },
+      {
+        "_path": "Library/ssl/cert.pem",
+        "path_type": "hardlink",
+        "sha256": "796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe",
+        "size_in_bytes": 200116,
+        "sha256_in_prefix": "796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe"
+      }
+    ]
+  },
+  "link": {
+    "source": "C:\\Users\\tushi\\anaconda3\\pkgs\\ca-certificates-2026.10.20-h382c6e5_1",
+    "type": 1
+  }
+}

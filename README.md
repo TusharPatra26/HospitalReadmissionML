@@ -2,10 +2,9 @@
 ### Explainable Machine Learning System for 30-Day Hospital Readmission Risk in Diabetic Inpatients
 
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
-[![License: Academic Research](https://img.shields.io/badge/license-Academic%20Research-lightgrey.svg)](LICENSE)
-[![Framework: Flask & Streamlit](https://img.shields.io/badge/framework-Flask%20%7C%20Streamlit-teal.svg)](app.py)
+[![Framework: Flask](https://img.shields.io/badge/framework-Flask-teal.svg)](app.py)
 [![XAI: SHAP TreeExplainer](https://img.shields.io/badge/XAI-SHAP%20Waterfall-purple.svg)](src/explainability)
-[![Tests: Pytest Passing](https://img.shields.io/badge/tests-25%2F25%20passing-brightgreen.svg)](tests/)
+[![Tests: pytest](https://img.shields.io/badge/tests-pytest-brightgreen.svg)](tests/)
 
 ---
 
@@ -39,51 +38,46 @@ This application provides an **end-to-end, modular, and explainable Machine Lear
 
 ---
 
-## 3. Modular Architecture & Directory Structure
+## 3. Project Structure
 
-Following strict software engineering separation of concerns, inference and training logic are decoupled from web routes:
+The Flask routes are separate from the reusable data, modeling, and prediction code:
 
 ```text
 Hospital-Readmission-Predictor/
 ├── data/
-│   ├── raw/                 # Authentic UCI diabetic_data.csv & IDS_mapping.csv
-│   ├── interim/             # Cleaned intermediate partitions
-│   └── processed/           # Transformed feature matrices
+│   ├── raw/                 # Source CSV files
+│   ├── interim/             # Optional intermediate data
+│   └── processed/           # Optional processed data
 ├── notebooks/
-│   ├── 02_Extensive_EDA.ipynb # Interactive EDA and statistical tests
+│   ├── 1. EDA HOSPITAL READMISSION.ipynb
+│   └── 2. MODEL TRAINING.ipynb
 ├── src/
-│   ├── data_ingestion/      # Dataset loading & multi-table mapping parser
-│   ├── data_validation/     # Schema validators and sanity checks
-│   ├── cleansing/           # Missing values, outliers, duplicate handler, terminal disposition filter
-│   ├── preprocessing/       # Scikit-Learn transformers, scalers, encoders, patient-aware splitting
-│   ├── feature_engineering/ # ICD-9 mapping, polypharmacy, utilization, age features
-│   ├── models/              # Baseline, Tree, RF, Extra Trees, XGBoost, HistGradientBoosting
-│   ├── evaluation/          # Confusion matrix, ROC, PR-AUC, calibration, threshold analysis
-│   ├── explainability/      # SHAP TreeExplainer, waterfall & beeswarm plots
-│   ├── prediction/          # Framework-independent inference engine
-│   └── utils/               # Config, logging, file I/O, visualization
+│   ├── data_ingestion/      # Dataset loading and ID mappings
+│   ├── data_validation/     # Input schema validation
+│   ├── cleansing/           # Missing values, duplicates, and outliers
+│   ├── preprocessing/       # Encoders, scalers, and model pipeline
+│   ├── feature_engineering/ # Clinical and utilization features
+│   ├── models/              # Model training and artifact loading
+│   ├── evaluation/          # Metrics and threshold analysis
+│   ├── explainability/      # SHAP explanations
+│   ├── prediction/          # Validation and inference service
+│   └── utils/               # Configuration, logging, and file helpers
 ├── artifacts/
-│   ├── models/              # Serialized best_model.pkl, preprocessing_pipeline.pkl, metadata.json
-│   ├── explainability/      # Serialized SHAP background sample
-│   ├── evaluation/          # model_comparison.csv, evaluation_metrics.json
-│   └── plots/               # High-res figures (eda/, training/, shap/)
-├── templates/               # Responsive Flask Jinja2 HTML templates
-├── static/                  # CSS stylesheets, JavaScript charts, branding
-├── tests/                   # Complete Pytest test suite (25 tests)
-├── reports/                 # Technical Markdown reports
-│   ├── EDA_REPORT.md
-│   ├── FEATURE_ENGINEERING_REPORT.md
-│   ├── MODEL_EXPERIMENTS.md
-│   ├── MODEL_SELECTION.md
-│   └── LIMITATIONS.md
-├── app.py                   # Production Flask application
-├── streamlit_app.py         # Streamlit Cloud deployment app
-├── train.py                 # End-to-end training pipeline script
-├── evaluate.py              # Standalone evaluation & calibration script
-├── requirements.txt         # Tested Python dependencies
-├── config.yaml              # Centralized hyperparameters & paths
-└── .gitignore               # Clean VCS filter
+│   ├── models/              # Local model files and tracked metadata
+│   ├── evaluation/          # Evaluation metrics and model comparison
+│   └── plots/               # EDA, training, and SHAP figures
+├── reports/                 # EDA, model, and limitation reports
+├── static/                  # CSS, JavaScript, and images
+├── templates/               # Flask/Jinja templates
+├── tests/                   # pytest suite
+├── app.py                   # Flask application
+├── train.py                 # Model training pipeline
+├── evaluate.py              # Model evaluation
+├── config.yaml              # Project configuration
+└── requirements.txt         # Python dependencies
 ```
+
+The local virtual environment, Python caches, generated model binaries, and intermediate datasets are excluded from version control.
 
 ---
 
@@ -93,47 +87,40 @@ Hospital-Readmission-Predictor/
 - Python 3.10, 3.11, or 3.12
 - Git
 
-### Installation
-```bash
-# 1. Clone repository
+### Installation (Windows PowerShell)
+```powershell
 git clone https://github.com/TusharPatra26/HospitalReadmissionML.git
 cd HospitalReadmissionML
-
-# 2. Activate virtual environment
-# Windows:
-.\venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
-
-# 3. Install calibrated dependencies
-pip install -r requirements.txt
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
 ```
 
-### Running Tests
+On macOS/Linux, create and activate the environment with:
 ```bash
-pytest tests/
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-### Retraining the Models
+### Run the Flask app
+```bash
+python app.py
+```
+Open <http://127.0.0.1:5000>.
+
+### Run tests
+```bash
+python -m pytest tests/ -q
+```
+
+### Train or evaluate the model
 ```bash
 python train.py
-```
-
-### Standalone Model Evaluation
-```bash
 python evaluate.py
 ```
 
-### Launching the Web Applications
-```bash
-# Option A: Production Flask Application (Recommended Local UI)
-python app.py
-# Access at http://127.0.0.1:5000
-
-# Option B: Streamlit Interface (Cloud-Ready UI)
-streamlit run streamlit_app.py
-# Access at http://localhost:8501
-```
+The prediction app and prediction tests require generated model files in `artifacts/models/`. If they are not present in your checkout, run `python train.py` first. The training workflow requires the raw CSV files in `data/raw/`.
 
 ---
 
@@ -215,23 +202,18 @@ Every prediction is explained via game-theoretic **TreeSHAP** in log-odds space:
 
 ---
 
-## 10. Web Interfaces
+## 10. Flask Web Interface
 
-### Flask Clinical Portal
 - Deep navy/teal clinical analytics aesthetic.
-- 7 comprehensive pages: Overview Dashboard, Risk Predictor, SHAP Explainability, Population Analytics, Model Performance, Feature Insights, and About.
+- Pages for the dashboard, risk prediction, SHAP explainability, population analytics, model performance, and project limitations.
 - Pre-filled interactive Demo Personas (Low Risk, Moderate Risk, Complex High Utilizer).
 - Real-time interactive Chart.js local waterfall charts.
-
-### Streamlit Cloud Interface
-- Standalone `streamlit_app.py` sharing the same prediction engine and input validation schemas.
-- Interactive parameter sliders, Plotly horizontal waterfall visualizations, and global SHAP exploration.
 
 ---
 
 ## 11. Testing & Code Quality
 
-The project includes an automated **Pytest test suite** with 25 tests:
+The project includes an automated **pytest test suite** (29 tests at the time of writing):
 - `tests/test_data_loader.py`: Ingestion, IDS mapping parsing, target derivation.
 - `tests/test_features.py`: ICD-9 mapping, comorbidity indicators, polypharmacy, age midpoint.
 - `tests/test_preprocessing.py`: Scalers, encoders, ColumnTransformer, patient-aware splitting.
@@ -239,9 +221,9 @@ The project includes an automated **Pytest test suite** with 25 tests:
 - `tests/test_prediction.py`: Framework-independent prediction service, validation, risk tiers.
 - `tests/test_flask_app.py`: Flask route availability, JSON API endpoints.
 
-Run all tests via:
+Run the suite from the repository root:
 ```bash
-pytest tests/
+python -m pytest tests/ -q
 ```
 
 ---

@@ -63,7 +63,7 @@ Hospital-Readmission-Predictor/
 │   ├── prediction/          # Validation and inference service
 │   └── utils/               # Configuration, logging, and file helpers
 ├── artifacts/
-│   ├── models/              # Local model files and tracked metadata
+│   ├── models/              # Tracked inference model, preprocessing pipeline, and metadata
 │   ├── evaluation/          # Evaluation metrics and model comparison
 │   └── plots/               # EDA, training, and SHAP figures
 ├── reports/                 # EDA, model, and limitation reports
@@ -77,7 +77,7 @@ Hospital-Readmission-Predictor/
 └── requirements.txt         # Python dependencies
 ```
 
-The local virtual environment, Python caches, generated model binaries, and intermediate datasets are excluded from version control.
+The local virtual environment, Python caches, other generated model binaries, and intermediate datasets are excluded from version control. The model and preprocessing pipeline required for inference are tracked so hosted deployments can load them.
 
 ---
 
@@ -124,7 +124,7 @@ The prediction app and prediction tests require generated model files in `artifa
 
 ### Deploying on Render
 
-The `.python-version` file pins Render to Python 3.12, which is within the versions supported by the dependency constraints in `requirements.txt`. If your Render service has a `PYTHON_VERSION` environment variable set, remove it or set it to a Python 3.12 patch release; that setting takes precedence over `.python-version`. After pushing changes, trigger a new deploy.
+The `.python-version` file pins Render to Python 3.12, which is within the versions supported by the dependency constraints in `requirements.txt`. Render needs `artifacts/models/best_model.pkl` and `artifacts/models/preprocessing_pipeline.pkl` in the deployed checkout; keep these tracked files in Git when updating the model. If your Render service has a `PYTHON_VERSION` environment variable set, remove it or set it to a Python 3.12 patch release; that setting takes precedence over `.python-version`. Push the model files and code changes, then trigger a new deploy.
 
 ---
 

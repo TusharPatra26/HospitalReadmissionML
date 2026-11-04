@@ -55,10 +55,11 @@ data/processed/*
 !data/raw/
 artifacts/models/*.pkl
 artifacts/models/*.joblib
+!artifacts/models/best_model.pkl
+!artifacts/models/preprocessing_pipeline.pkl
 artifacts/explainability/*.pkl
 artifacts/explainability/*.joblib
 
 # Logs
 logs/
 *.log
-
